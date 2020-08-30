@@ -36,6 +36,7 @@ class AuthServices {
     await _auth.signOut();
   }  
 
+  static Stream<FirebaseUser> get userStream => _auth.onAuthStateChanged;
 }
 
 class SignInSignUpResult {
