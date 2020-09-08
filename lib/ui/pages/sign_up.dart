@@ -88,8 +88,15 @@ class _SignUpPageState extends State<SignUpPage> {
                         Align(
                           alignment: Alignment.bottomCenter,
                           child: GestureDetector(
-                            onTap: () {
-                              // TODO: nanti yaa
+                            onTap: () async {
+                              if (widget.registrationData.profileImage ==
+                                  null) {
+                                widget.registrationData.profileImage =
+                                    await getImage();
+                              } else {
+                                widget.registrationData.profileImage = null;
+                              }
+                              setState(() {});
                             },
                             child: Container(
                               height: 28,
@@ -101,7 +108,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                                   .profileImage ==
                                               null)
                                           ? "assets/btn_add_photo.png"
-                                          : "assets/tbn_del_photo.png"))),
+                                          : "assets/btn_del_photo.png"))),
                             ),
                           ),
                         ),
@@ -159,7 +166,51 @@ class _SignUpPageState extends State<SignUpPage> {
                       child: Icon(Icons.arrow_forward),
                       backgroundColor: mainColor,
                       elevation: 0,
-                      onPressed: () {})
+                      onPressed: () {
+                        if (!(nameController.text.trim() != "" &&
+                            emailController.text.trim() != "" &&
+                            passwordController.text.trim() != "" &&
+                            retypePasswordController.text.trim() != "")) {
+                          Flushbar(
+                            duration: Duration(milliseconds: 1500),
+                            flushbarPosition: FlushbarPosition.TOP,
+                            backgroundColor: Colors.pink,
+                            message: "Please fill all the fields",
+                          )..show(context);
+                        } else if (passwordController.text !=
+                            retypePasswordController.text) {
+                          Flushbar(
+                            duration: Duration(milliseconds: 1500),
+                            flushbarPosition: FlushbarPosition.TOP,
+                            backgroundColor: Colors.pink,
+                            message: "Password doesn't match",
+                          )..show(context);
+                        } else if (passwordController.text.length < 6) {
+                          Flushbar(
+                            duration: Duration(milliseconds: 1500),
+                            flushbarPosition: FlushbarPosition.TOP,
+                            backgroundColor: Colors.pink,
+                            message: "Password min 6 character",
+                          )..show(context);
+                        } else if (!EmailValidator.validate(
+                            emailController.text)) {
+                          Flushbar(
+                            duration: Duration(milliseconds: 1500),
+                            flushbarPosition: FlushbarPosition.TOP,
+                            backgroundColor: Colors.pink,
+                            message: "Email not valid",
+                          )..show(context);
+                        } else {
+                          widget.registrationData.name = nameController.text;
+                          widget.registrationData.email = emailController.text;
+                          widget.registrationData.password =
+                              passwordController.text;
+
+                          context
+                              .bloc<PageBloc>()
+                              .add(GoToPreferencePage(widget.registrationData));
+                        }
+                      })
                 ],
               ),
             ],
